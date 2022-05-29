@@ -1,19 +1,28 @@
 import { Duration, Stack, StackProps } from 'aws-cdk-lib';
-import * as sns from 'aws-cdk-lib/aws-sns';
-import * as subs from 'aws-cdk-lib/aws-sns-subscriptions';
-import * as sqs from 'aws-cdk-lib/aws-sqs';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
 import { Construct } from 'constructs';
 
 export class RustStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    const queue = new sqs.Queue(this, 'RustQueue', {
-      visibilityTimeout: Duration.seconds(300)
+    let fn = new lambda.Function(this, 'LambdaRustStack', {
+      code: lambda.Code.fromAsset(
+        'lambda/target/aarch64-unknown-linux-gnu/release/lambda'
+      ),
+      functionName: "slack-jira-notification-dev",
+      handler: 'main',
+      memorySize: 1024,
+      environment: {
+        RUST_BACKTRACE: '1',
+      },
+      runtime: lambda.Runtime.PROVIDED_AL2,
+      architecture: lambda.Architecture.ARM_64,
+      timeout: Duration.seconds(300),
     });
-
-    const topic = new sns.Topic(this, 'RustTopic');
-
-    topic.addSubscription(new subs.SqsSubscription(queue));
+    
+    fn.addFunctionUrl({
+      authType: lambda.FunctionUrlAuthType.NONE,
+    });
   }
 }
