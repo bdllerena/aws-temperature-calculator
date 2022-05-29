@@ -10,7 +10,7 @@ export class RustStack extends Stack {
       code: lambda.Code.fromAsset(
         'lambda/target/aarch64-unknown-linux-gnu/release/lambda'
       ),
-      functionName: "slack-jira-notification-dev",
+      functionName: "temperature-calculator-dev",
       handler: 'main',
       memorySize: 1024,
       environment: {
