@@ -1,28 +1,41 @@
+
 env:
   global:
-    - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_PRODUCTION}
-    - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_PRODUCTION}
+    - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+    - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
 jobs:
   include:
-    - language: node_js
-      node_js: v14
-      script:
-        - npm install -g typescript 
-        - npm install -g aws-cdk
-        - npm install
-
     - language: rust
-      script:
+      script: echo "npm test temporarily disabled"
+      before_install:
+        - sudo wget https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh -O ~/.nvm/nvm.sh
+        - source ~/.nvm/nvm.sh
+        - . "$NVM_DIR/nvm.sh"
+        - nvm install 14.5.0  
+        - node --version
+        - npm i -g typescript
+        - npm install -g aws-cdk
+        - npm i
+        - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+        - unzip awscliv2.zip
+        - sudo ./aws/install
+        - aws --version
+      before_script:
         - cd lambda
         - cargo install cross
         - cross build --target aarch64-unknown-linux-gnu --release
-
-      stages:
-        - name: Deploy
-
-    - stage: Deploy
-      name: Deploy to AWS Cloud
-      script:
-        - cd ..
+        - cd target/aarch64-unknown-linux-gnu/release
+        - mkdir lambda
+        - cp bootstrap lambda
+        - ls
+        - cd lambda
+        - ls
+        - cd ../../../../../
+        - ls
+        - mkdir ~/.aws/
+        - touch ~/.aws/credentials
+        - echo -e "[default]\n $AWS_ACCESS_KEY_ID \n $AWS_SECRET_ACCESS_KEY \n region=us-east-1" >> ~/.aws/credentials
+        - cat ~/.aws/credentials
+        - cdk bootstrap aws://620423771455/us-east-1 
         - cdk deploy --require-approval never
-        - cd lambda/target/aarch64-unknown-linux-gnu/release && cp bootstrap /lambda
+

@@ -2,16 +2,15 @@ import * as cdk from 'aws-cdk-lib';
 import { Template, Match } from 'aws-cdk-lib/assertions';
 import * as Rust from '../lib/rust-stack';
 
-test('SQS Queue and SNS Topic Created', () => {
+test('Lambda Created', () => {
   const app = new cdk.App();
   // WHEN
-  const stack = new Rust.RustStack(app, 'MyTestStack');
+  const stack = new Rust.RustStack(app, 'LambdaRustStack');
   // THEN
 
   const template = Template.fromStack(stack);
 
-  template.hasResourceProperties('AWS::SQS::Queue', {
-    VisibilityTimeout: 300
+  template.hasResourceProperties('AWS::Lambda::Function', {
+    MemorySize: 1024
   });
-  template.resourceCountIs('AWS::SNS::Topic', 1);
 });
