@@ -1,0 +1,28 @@
+env:
+  global:
+    - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID_PRODUCTION}
+    - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY_PRODUCTION}
+jobs:
+  include:
+    - language: node_js
+      node_js: v14
+      script:
+        - npm install -g typescript 
+        - npm install -g aws-cdk
+        - npm install
+
+    - language: rust
+      script:
+        - cd lambda
+        - cargo install cross
+        - cross build --target aarch64-unknown-linux-gnu --release
+
+      stages:
+        - name: Deploy
+
+    - stage: Deploy
+      name: Deploy to AWS Cloud
+      script:
+        - cd ..
+        - cdk deploy --require-approval never
+        - cd lambda/target/aarch64-unknown-linux-gnu/release && cp bootstrap /lambda
