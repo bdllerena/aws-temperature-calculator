@@ -35,7 +35,5 @@ jobs:
         - mkdir ~/.aws/
         - touch ~/.aws/credentials
         - echo -e "[default]\n $AWS_ACCESS_KEY_ID \n $AWS_SECRET_ACCESS_KEY \n region=us-east-1" >> ~/.aws/credentials
-        - cat ~/.aws/credentials
-        - cdk bootstrap aws://620423771455/us-east-1 
         - cdk deploy --require-approval never
 
