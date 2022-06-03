@@ -2,7 +2,7 @@
 
 You should explore the contents of this project. It demonstrates a CDK app with an instance of a stack (`RustStack`).
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+The `cdk.json` file tells the CDK Toolkit how to execute your app .
 
 ## Useful commands
 
